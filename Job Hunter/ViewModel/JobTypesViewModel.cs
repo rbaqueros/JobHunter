@@ -51,7 +51,7 @@ namespace Job_Hunter.ViewModel
             _dataService = dataService;
 
             // Fill job type collection
-            JobTypeCollection = new ObservableCollection<JobTypeItem>();
+            _jobTypeCollection = new ObservableCollection<JobTypeItem>();
             _dataService.JobTypeList(FillJobTypeCollection);
             _dataService.JobTypeModified += (sender, e) => _dataService.JobTypeList(FillJobTypeCollection);
 

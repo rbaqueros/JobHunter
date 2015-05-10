@@ -52,7 +52,7 @@ namespace Job_Hunter.ViewModel
             _dataService = dataService;
 
             // Fill next action collection
-            NextActionCollection = new ObservableCollection<NextActionItem>();
+            _nextActionCollection = new ObservableCollection<NextActionItem>();
             _dataService.NextActionList(FillNextActionList);
             _dataService.NextActionModified += (sender, e) => _dataService.NextActionList(FillNextActionList);
 
