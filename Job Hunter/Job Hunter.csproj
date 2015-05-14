@@ -36,7 +36,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Job_hunting2.ico</ApplicationIcon>
+    <ApplicationIcon>Job Hunter Icon 3.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CountryInfo, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -89,11 +89,10 @@
     <Compile Include="Model\ApplicationOrganizationItem.cs" />
     <Compile Include="Model\DataService.cs" />
     <Compile Include="Model\IDataService.cs" />
-    <Compile Include="Model\JobTypeItem.cs" />
-    <Compile Include="Model\NextActionItem.cs" />
     <Compile Include="Model\OrganizationItem.cs" />
-    <Compile Include="Model\PriorityItem.cs" />
-    <Compile Include="Model\StatusItem.cs" />
+    <Compile Include="ViewModel\SimpleItemBaseViewModel.cs" />
+    <Compile Include="ViewModel\ViewModelItems\PriorityVMItem.cs" />
+    <Compile Include="Model\SimpleItem.cs" />
     <Compile Include="ViewModel\AboutViewModel.cs" />
     <Compile Include="ViewModel\ApplicationViewModel.cs" />
     <Compile Include="ViewModel\ViewModelItems\ApplicationOrganizationVMItem.cs" />
@@ -229,15 +228,8 @@
     <Resource Include="Resources\Entypo-license.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Job_hunting.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Job_hunting2.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\job_hunting2.png" />
-  </ItemGroup>
-  <ItemGroup>
+    <Resource Include="Job Hunter Icon 3.ico" />
+    <Resource Include="Resources\Job Hunter Icon 5 - 256x256.png" />
     <Content Include="SQLite.Interop.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

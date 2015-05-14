@@ -32,12 +32,12 @@ namespace Job_Hunter.Model
         public event EventHandler ApplicationModified;
 
         // Table names
-        private const string tableActiveCountry = "active_country";
-        private const string tableJobType = "job_type";
-        private const string tableNextAction = "next_action";
-        private const string tableStatus = "status";
-        private const string tableOrganization = "organization";
-        private const string tableApplication = "application";
+        public const string tableActiveCountry = "active_country";
+        public const string tableJobType = "job_type";
+        public const string tableNextAction = "next_action";
+        public const string tableStatus = "status";
+        public const string tableOrganization = "organization";
+        public const string tableApplication = "application";
 
         // Database path and connection string
         private readonly string appDataPath;
@@ -128,6 +128,7 @@ namespace Job_Hunter.Model
         {
             string queryString = "insert into " + tableApplication + " values(null, @title, @job_id, @job_url, @job_type, @status, @priority, @next_action, @next_action_date, @organization, "
                 + "@iso2, @city, @contact_name, @contact_phone, @contact_email, @description, @note)";
+
             using (SQLiteConnection connection = new SQLiteConnection(strConnection))
             using (SQLiteCommand dbCommand = new SQLiteCommand(queryString, connection))
             {
@@ -516,159 +517,98 @@ namespace Job_Hunter.Model
          * Next action handling
          *
          */
-        public void NextActionList(Action<NextActionItem[]> callback)
+        public void NextActionList(Action<SimpleItem[]> callback)
         {
-            List<NextActionItem> listNextAction = new List<NextActionItem>();
+            callback(SimpleItemList(tableNextAction));
+        }
 
-            string queryString = "select * from " + tableNextAction + " order by position";
+        public int AddNextAction(string title, string note)
+        {
+            int result = AddSimpleItem(title, note, tableNextAction);
 
-            // Get status list from database.
-            using (SQLiteConnection connection = new SQLiteConnection(strConnection))
-            using (SQLiteCommand command = new SQLiteCommand(queryString, connection))
+            if (result > 0)
             {
-                connection.Open();
-
-                SQLiteDataReader reader = command.ExecuteReader();
-                int idColumn = reader.GetOrdinal("id");
-                int positionColumn = reader.GetOrdinal("position");
-                int nextActionColumn = reader.GetOrdinal("next_action");
-                int noteColumn = reader.GetOrdinal("note");
-                while (reader.Read())
+                // Notify changes.
+                if (this.NextActionModified != null)
                 {
-                    long id = reader.GetInt64(idColumn);
-                    long position = reader.GetInt64(positionColumn);
-                    string nextAction = reader.GetString(nextActionColumn);
-                    string note = reader.GetString(noteColumn);
-                    listNextAction.Add(new NextActionItem(id, position, nextAction, note));
+                    this.NextActionModified(this, null);
                 }
             }
 
-            callback(listNextAction.ToArray());
+            return result;
         }
 
-        public int AddNextAction(NextActionItem newItem)
+        public int DeleteNextAction(long id)
         {
-            string queryString = "insert into " + tableNextAction + " values(null,@position,@next_action,@note)";
-            using (SQLiteConnection connection = new SQLiteConnection(strConnection))
-            using (SQLiteCommand dbCommand = new SQLiteCommand(queryString, connection))
+            int result = DeleteSimpleItem(id, tableNextAction);
+            if (result > 0)
             {
-                // Set command parameters.
-                dbCommand.Parameters.AddWithValue("@position", newItem.Position);
-                dbCommand.Parameters.AddWithValue("@next_action", newItem.NextAction);
-                dbCommand.Parameters.AddWithValue("@note", newItem.Note);
+                // Notify changes.
+                if (this.NextActionModified != null)
+                {
+                    this.NextActionModified(this, null);
+                }
+            }
 
-                // Add new status to table.
-                connection.Open();
-                int result = dbCommand.ExecuteNonQuery();
+            return result;
+        }
 
+        public int UpdateNextAction(long id, long position, string title, string note)
+        {
+            // Update status
+            int result = UpdateSimpleItem(id, position, title, note, tableNextAction);
+
+            // If table changed notify
+            if (result > 0)
+            {
+                // Notify changes.
+                if (this.NextActionModified != null)
+                {
+                    this.NextActionModified(this, null);
+                }
+            }
+
+            // Return the result
+            return result;
+        }
+
+        public bool NextActionDown(long position)
+        {
+            // Switch item positions
+            if (SwitchPosition(position, tableNextAction, false))
+            {
                 // Notify changes.
                 if (this.NextActionModified != null)
                 {
                     this.NextActionModified(this, null);
                 }
 
-                // Return the result.
-                return result;
+                // Return success
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
-        public int DeleteNextAction(NextActionItem newItem)
+        public bool NextActionUp(long position)
         {
-            string queryString = "delete from " + tableNextAction + " where id=@id";
-
-            using (SQLiteConnection connection = new SQLiteConnection(strConnection))
-            using (SQLiteCommand dbCommand = new SQLiteCommand(queryString, connection))
+            // Switch item positions
+            if (SwitchPosition(position, tableNextAction, true))
             {
-                // Set command parameters.
-                dbCommand.Parameters.AddWithValue("@id", newItem.Id);
-
-                // Delete status from table.
-                connection.Open();
-                int result = dbCommand.ExecuteNonQuery();
-
                 // Notify changes.
                 if (this.NextActionModified != null)
                 {
                     this.NextActionModified(this, null);
                 }
 
-                // Return the result.
-                return result;
+                // Return success
+                return true;
             }
-        }
-
-        public int UpdateNextAction(NextActionItem newItem)
-        {
-            string queryString = "update " + tableNextAction
-                + " set position=@position, next_action=@next_action, note=@note where id=@id";
-
-            using (SQLiteConnection connection = new SQLiteConnection(strConnection))
-            using (SQLiteCommand dbCommand = new SQLiteCommand(queryString, connection))
+            else
             {
-                // Set command parameters.
-                dbCommand.Parameters.AddWithValue("@id", newItem.Id);
-                dbCommand.Parameters.AddWithValue("@position", newItem.Position);
-                dbCommand.Parameters.AddWithValue("@next_action", newItem.NextAction);
-                dbCommand.Parameters.AddWithValue("@note", newItem.Note);
-
-                // Update status from table.
-                connection.Open();
-                int result = dbCommand.ExecuteNonQuery();
-
-                // Notify changes.
-                if (this.NextActionModified != null)
-                {
-                    this.NextActionModified(this, null);
-                }
-
-                // Return the result.
-                return result;
-            }
-        }
-
-        public bool UpdateNextActionList(NextActionItem[] itemList)
-        {
-            using (SQLiteConnection connection = new SQLiteConnection(strConnection))
-            {
-                // Open database
-                connection.Open();
-
-                // Update status entries
-                using (SQLiteTransaction transaction = connection.BeginTransaction())
-                {
-                    foreach (NextActionItem item in itemList)
-                    {
-                        string queryString = "update " + tableNextAction
-                            + " set position=@position, next_action=@next_action, note=@note where id=@id";
-                        using (SQLiteCommand dbCommand = new SQLiteCommand(queryString, connection))
-                        {
-                            // Set command parameters.
-                            dbCommand.Parameters.AddWithValue("@id", item.Id);
-                            dbCommand.Parameters.AddWithValue("@position", item.Position);
-                            dbCommand.Parameters.AddWithValue("@next_action", item.NextAction);
-                            dbCommand.Parameters.AddWithValue("@note", item.Note);
-
-                            // Update item in table.
-                            if (dbCommand.ExecuteNonQuery() != 1)
-                            {
-                                transaction.Rollback();
-                                return false;
-                            }
-                        }
-                    }
-
-                    // Commit changes
-                    transaction.Commit();
-
-                    // Notify changes.
-                    if (this.NextActionModified != null)
-                    {
-                        this.NextActionModified(this, null);
-                    }
-
-                    // Return success
-                    return true;
-                }
+                return false;
             }
         }
 
@@ -677,11 +617,213 @@ namespace Job_Hunter.Model
          * Job type handling
          * 
          */
-        public void JobTypeList(Action<JobTypeItem[]> callback)
+        public void JobTypeList(Action<SimpleItem[]> callback)
         {
-            List<JobTypeItem> listJobType = new List<JobTypeItem>();
+            callback(SimpleItemList(tableJobType));
+        }
 
-            string queryString = "select * from " + tableJobType + " order by position";
+        public int AddJobType(string title, string note)
+        {
+            int result = AddSimpleItem(title, note, tableJobType);
+
+            if (result > 0)
+            {
+                // Notify changes.
+                if (this.JobTypeModified != null)
+                {
+                    this.JobTypeModified(this, null);
+                }
+            }
+
+            return result;
+        }
+
+        public int DeleteJobType(long id)
+        {
+            int result = DeleteSimpleItem(id, tableJobType);
+            if (result > 0)
+            {
+                // Notify changes.
+                if (this.JobTypeModified != null)
+                {
+                    this.JobTypeModified(this, null);
+                }
+            }
+
+            return result;
+        }
+
+        public int UpdateJobType(long id, long position, string title, string note)
+        {
+            // Update status
+            int result = UpdateSimpleItem(id, position, title, note, tableJobType);
+
+            // If table changed notify
+            if (result > 0)
+            {
+                // Notify changes.
+                if (this.JobTypeModified != null)
+                {
+                    this.JobTypeModified(this, null);
+                }
+            }
+
+            // Return the result
+            return result;
+        }
+
+        public bool JobTypeDown(long position)
+        {
+            // Switch item positions
+            if (SwitchPosition(position, tableJobType, false))
+            {
+                // Notify changes.
+                if (this.JobTypeModified != null)
+                {
+                    this.JobTypeModified(this, null);
+                }
+
+                // Return success
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public bool JobTypeUp(long position)
+        {
+            // Switch item positions
+            if (SwitchPosition(position, tableJobType, true))
+            {
+                // Notify changes.
+                if (this.JobTypeModified != null)
+                {
+                    this.JobTypeModified(this, null);
+                }
+
+                // Return success
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /*
+         * 
+         * Status handling
+         * 
+         */
+        public void StatusList(Action<SimpleItem[]> callback)
+        {
+            callback(SimpleItemList(tableStatus));
+        }
+
+        public int AddStatus(string title, string note)
+        {
+            int result = AddSimpleItem(title, note, tableStatus);
+
+            if (result > 0)
+            {
+                // Notify changes.
+                if (this.StatusModified != null)
+                {
+                    this.StatusModified(this, null);
+                }
+            }
+
+            return result;
+        }
+
+        public int DeleteStatus(long id)
+        {
+            int result = DeleteSimpleItem(id, tableStatus);
+            Console.Out.WriteLine("Rows afected: " + result);
+            if (result > 0)
+            {
+                // Notify changes.
+                if (this.StatusModified != null)
+                {
+                    this.StatusModified(this, null);
+                }
+            }
+
+            return result;
+        }
+
+        public int UpdateStatus(long id, long position, string title, string note)
+        {
+            // Update status
+            int result = UpdateSimpleItem(id, position, title, note, tableStatus);
+
+            // If table changed notify
+            if (result > 0)
+            {
+                // Notify changes.
+                if (this.StatusModified != null)
+                {
+                    this.StatusModified(this, null);
+                }
+            }
+
+            // Return the result
+            return result;
+        }
+
+        public bool StatusDown(long position)
+        {
+            // Switch item positions
+            if (SwitchPosition(position, tableStatus, false))
+            {
+                // Notify changes.
+                if (this.StatusModified != null)
+                {
+                    this.StatusModified(this, null);
+                }
+
+                // Return success
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public bool StatusUp(long position)
+        {
+            // Switch item positions
+            if (SwitchPosition(position, tableStatus, true))
+            {
+                // Notify changes.
+                if (this.StatusModified != null)
+                {
+                    this.StatusModified(this, null);
+                }
+
+                // Return success
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+/*
+ * 
+ * Simple item methods and classes
+ * 
+ */
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
+        private SimpleItem[] SimpleItemList(string table)
+        {
+            List<SimpleItem> itemList = new List<SimpleItem>();
+
+            string queryString = "select * from " + table + " order by position";
 
             // Get status list from database.
             using (SQLiteConnection connection = new SQLiteConnection(strConnection))
@@ -692,122 +834,172 @@ namespace Job_Hunter.Model
                 SQLiteDataReader reader = command.ExecuteReader();
                 int idColumn = reader.GetOrdinal("id");
                 int positionColumn = reader.GetOrdinal("position");
-                int jobTypeColumn = reader.GetOrdinal("job_type");
+                int titleColumn = reader.GetOrdinal(table);
                 int noteColumn = reader.GetOrdinal("note");
                 while (reader.Read())
                 {
                     long id = reader.GetInt64(idColumn);
                     long position = reader.GetInt64(positionColumn);
-                    string jobType = reader.GetString(jobTypeColumn);
+                    string title = reader.GetString(titleColumn);
                     string note = reader.GetString(noteColumn);
-                    listJobType.Add(new JobTypeItem(id, position, jobType, note));
+                    itemList.Add(new SimpleItem(id, position, title, note));
                 }
             }
 
-            callback(listJobType.ToArray());
+            return itemList.ToArray();
         }
 
-        public int AddJobType(JobTypeItem newItem)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
+        private int AddSimpleItem(string title, string note, string table)
         {
-            string queryString = "insert into " + tableJobType + " values(null,@position,@job_type,@note)";
+            string nextPositionQuery = "select max(position)+1 from " + table;
+            string queryString = "insert into " + table + " values(null,(" + nextPositionQuery + "),@title,@note)";
             using (SQLiteConnection connection = new SQLiteConnection(strConnection))
             using (SQLiteCommand dbCommand = new SQLiteCommand(queryString, connection))
             {
                 // Set command parameters.
-                dbCommand.Parameters.AddWithValue("@position", newItem.Position);
-                dbCommand.Parameters.AddWithValue("@job_type", newItem.JobType);
-                dbCommand.Parameters.AddWithValue("@note", newItem.Note);
+                dbCommand.Parameters.AddWithValue("@title", title);
+                dbCommand.Parameters.AddWithValue("@note", note);
 
                 // Add new status to table.
                 connection.Open();
-                int result = dbCommand.ExecuteNonQuery();
-
-                // Notify changes.
-                if (this.JobTypeModified != null)
-                {
-                    this.JobTypeModified(this, null);
-                }
-
-                // Return the result.
-                return result;
+                return dbCommand.ExecuteNonQuery();
             }
         }
 
-        public int DeleteJobType(JobTypeItem newItem)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
+        private int UpdateSimpleItem(long id, long position, string title, string note, string table)
         {
-            string queryString = "delete from " + tableJobType + " where id=@id";
+            string queryString = "update " + table
+                + " set position=@position, " + table + "=@title, note=@note where id=@id";
 
             using (SQLiteConnection connection = new SQLiteConnection(strConnection))
             using (SQLiteCommand dbCommand = new SQLiteCommand(queryString, connection))
             {
                 // Set command parameters.
-                dbCommand.Parameters.AddWithValue("@id", newItem.Id);
-
-                // Delete status from table.
-                connection.Open();
-                int result = dbCommand.ExecuteNonQuery();
-
-                // Notify changes.
-                if (this.JobTypeModified != null)
-                {
-                    this.JobTypeModified(this, null);
-                }
-
-                // Return the result.
-                return result;
-            }
-        }
-
-        public int UpdateJobType(JobTypeItem newItem)
-        {
-            string queryString = "update " + tableJobType
-                + " set position=@position, job_type=@job_type, note=@note where id=@id";
-
-            using (SQLiteConnection connection = new SQLiteConnection(strConnection))
-            using (SQLiteCommand dbCommand = new SQLiteCommand(queryString, connection))
-            {
-                // Set command parameters.
-                dbCommand.Parameters.AddWithValue("@id", newItem.Id);
-                dbCommand.Parameters.AddWithValue("@position", newItem.Position);
-                dbCommand.Parameters.AddWithValue("@job_type", newItem.JobType);
-                dbCommand.Parameters.AddWithValue("@note", newItem.Note);
+                dbCommand.Parameters.AddWithValue("@id", id);
+                dbCommand.Parameters.AddWithValue("@position", position);
+                dbCommand.Parameters.AddWithValue("@title", title);
+                dbCommand.Parameters.AddWithValue("@note", note);
 
                 // Update status from table.
                 connection.Open();
-                int result = dbCommand.ExecuteNonQuery();
-
-                // Notify changes.
-                if (this.JobTypeModified != null)
-                {
-                    this.JobTypeModified(this, null);
-                }
-
-                // Return the result.
-                return result;
+                return dbCommand.ExecuteNonQuery();
             }
         }
 
-        public bool UpdateJobTypeList(JobTypeItem[] itemList)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
+        private int DeleteSimpleItem(long id, string table)
         {
+            string queryString = "delete from " + table + " where id=@id";
+
+            using (SQLiteConnection connection = new SQLiteConnection(strConnection))
+            using (SQLiteCommand dbCommand = new SQLiteCommand(queryString, connection))
+            {
+                // Set command parameters.
+                dbCommand.Parameters.AddWithValue("@id", id);
+
+                // Delete status from table.
+                connection.Open();
+                return dbCommand.ExecuteNonQuery();
+            }
+        }
+
+        private class IdPosition
+        {
+            long _id;
+            long _position;
+
+            public IdPosition(long id, long position)
+            {
+                _id = id;
+                _position = position;
+            }
+
+            public long Id
+            {
+                get { return _id; }
+            }
+
+            public long Position
+            {
+                get { return _position; }
+                set { _position = value; }
+            }
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
+        private bool SwitchPosition(SimpleItem item, string table, bool moveUp)
+        {
+            return SwitchPosition(item.Position, table, moveUp);
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
+        private bool SwitchPosition(long pos, string table, bool moveUp)
+        {
+            string queryString;
+            List<IdPosition> listIdPosition = new List<IdPosition>();
+
             using (SQLiteConnection connection = new SQLiteConnection(strConnection))
             {
                 // Open database
                 connection.Open();
 
-                // Update status entries
+                // Select query string depending on direction
+                if (moveUp)
+                {
+                    // Move up string
+                    queryString = "select id,position from (select id,position from " + table
+                        + " where position=@position limit 1)"
+                        + " union "
+                        + "select id,position from (select id,position from " + table + " where position<@position "
+                        + "order by position desc limit 1) order by position";
+                }
+                else
+                {
+                    // Move down string
+                    queryString = "select id,position from (select id,position from " + table
+                        + " where position=@position limit 1)"
+                        + " union "
+                        + "select id,position from (select id,position from " + table + " where position>@position "
+                        + "order by position limit 1) order by position";
+                }
+
+                Console.Out.WriteLine("Moving item in position: " + pos + (moveUp ? " up" : " down"));
+                using (SQLiteCommand command = new SQLiteCommand(queryString, connection))
+                {
+                    // Set command parameters.
+                    command.Parameters.AddWithValue("@position", pos);
+
+                    // Get current and next item
+                    SQLiteDataReader reader = command.ExecuteReader();
+                    int idColumn = reader.GetOrdinal("id");
+                    int positionColumn = reader.GetOrdinal("position");
+                    while (reader.Read())
+                    {
+                        long id = reader.GetInt64(idColumn);
+                        long position = reader.GetInt64(positionColumn);
+                        listIdPosition.Add(new IdPosition(id, position));
+                    }
+                }
+                if (listIdPosition.Count != 2) { return false; }
+
+                // Exchange positions
+                long tmpPosition = listIdPosition[0].Position;
+                listIdPosition[0].Position = listIdPosition[1].Position;
+                listIdPosition[1].Position = tmpPosition;
+
+                // Update table entries
                 using (SQLiteTransaction transaction = connection.BeginTransaction())
                 {
-                    foreach (JobTypeItem item in itemList)
+                    foreach (IdPosition idPosition in listIdPosition)
                     {
-                        string queryString = "update " + tableJobType
-                            + " set position=@position, job_type=@job_type, note=@note where id=@id";
+                        queryString = "update " + table + " set position=@position where id=@id";
                         using (SQLiteCommand dbCommand = new SQLiteCommand(queryString, connection))
                         {
                             // Set command parameters.
-                            dbCommand.Parameters.AddWithValue("@id", item.Id);
-                            dbCommand.Parameters.AddWithValue("@position", item.Position);
-                            dbCommand.Parameters.AddWithValue("@job_type", item.JobType);
-                            dbCommand.Parameters.AddWithValue("@note", item.Note);
+                            dbCommand.Parameters.AddWithValue("@id", idPosition.Id);
+                            dbCommand.Parameters.AddWithValue("@position", idPosition.Position);
 
                             // Update item in table.
                             if (dbCommand.ExecuteNonQuery() != 1)
@@ -820,173 +1012,6 @@ namespace Job_Hunter.Model
 
                     // Commit changes
                     transaction.Commit();
-
-                    // Notify changes.
-                    if (this.JobTypeModified != null)
-                    {
-                        this.JobTypeModified(this, null);
-                    }
-
-                    // Return success
-                    return true;
-                }
-            }
-        }
-
-        /*
-         * 
-         * Status handling
-         * 
-         */
-        public void StatusList(Action<StatusItem[]> callback)
-        {
-            List<StatusItem> listStatus = new List<StatusItem>();
-
-            string queryString = "select * from " + tableStatus + " order by position";
-
-            // Get status list from database.
-            using (SQLiteConnection connection = new SQLiteConnection(strConnection))
-            using (SQLiteCommand command = new SQLiteCommand(queryString, connection))
-            {
-                connection.Open();
-
-                SQLiteDataReader reader = command.ExecuteReader();
-                int idColumn = reader.GetOrdinal("id");
-                int positionColumn = reader.GetOrdinal("position");
-                int statusColumn = reader.GetOrdinal("status");
-                int noteColumn = reader.GetOrdinal("note");
-                while (reader.Read())
-                {
-                    long id = reader.GetInt64(idColumn);
-                    long position = reader.GetInt64(positionColumn);
-                    string status = reader.GetString(statusColumn);
-                    string note = reader.GetString(noteColumn);
-                    listStatus.Add(new StatusItem(id, position, status, note));
-                }
-            }
-
-            callback(listStatus.ToArray());
-        }
-
-        public int AddStatus(StatusItem newItem)
-        {
-            string queryString = "insert into " + tableStatus + " values(null,@position,@status,@note)";
-            using (SQLiteConnection connection = new SQLiteConnection(strConnection))
-            using (SQLiteCommand dbCommand = new SQLiteCommand(queryString, connection))
-            {
-                // Set command parameters.
-                dbCommand.Parameters.AddWithValue("@position", newItem.Position);
-                dbCommand.Parameters.AddWithValue("@status", newItem.Status);
-                dbCommand.Parameters.AddWithValue("@note", newItem.Note);
-
-                // Add new status to table.
-                connection.Open();
-                int result = dbCommand.ExecuteNonQuery();
-
-                // Notify changes.
-                if (this.StatusModified != null)
-                {
-                    this.StatusModified(this, null);
-                }
-
-                // Return the result.
-                return result;
-            }
-        }
-
-        public int DeleteStatus(StatusItem newItem)
-        {
-            string queryString = "delete from " + tableStatus + " where id=@id";
-
-            using (SQLiteConnection connection = new SQLiteConnection(strConnection))
-            using (SQLiteCommand dbCommand = new SQLiteCommand(queryString, connection))
-            {
-                // Set command parameters.
-                dbCommand.Parameters.AddWithValue("@id", newItem.Id);
-
-                // Delete status from table.
-                connection.Open();
-                int result = dbCommand.ExecuteNonQuery();
-
-                // Notify changes.
-                if (this.StatusModified != null)
-                {
-                    this.StatusModified(this, null);
-                }
-
-                // Return the result.
-                return result;
-            }
-        }
-
-        public int UpdateStatus(StatusItem newItem)
-        {
-            string queryString = "update " + tableStatus 
-                + " set position=@position, status=@status, note=@note where id=@id";
-
-            using (SQLiteConnection connection = new SQLiteConnection(strConnection))
-            using (SQLiteCommand dbCommand = new SQLiteCommand(queryString, connection))
-            {
-                // Set command parameters.
-                dbCommand.Parameters.AddWithValue("@id", newItem.Id);
-                dbCommand.Parameters.AddWithValue("@position", newItem.Position);
-                dbCommand.Parameters.AddWithValue("@status", newItem.Status);
-                dbCommand.Parameters.AddWithValue("@note", newItem.Note);
-
-                // Update status from table.
-                connection.Open();
-                int result = dbCommand.ExecuteNonQuery();
-
-                // Notify changes.
-                if (this.StatusModified != null)
-                {
-                    this.StatusModified(this, null);
-                }
-
-                // Return the result.
-                return result;
-            }
-        }
-
-        public bool UpdateStatusList(StatusItem[] itemList)
-        {
-            using (SQLiteConnection connection = new SQLiteConnection(strConnection))
-            {
-                // Open database
-                connection.Open();
-
-                // Update status entries
-                using (SQLiteTransaction transaction = connection.BeginTransaction())
-                {
-                    foreach (StatusItem item in itemList)
-                    {
-                        string queryString = "update " + tableStatus
-                            + " set position=@position, status=@status, note=@note where id=@id";
-                        using (SQLiteCommand dbCommand = new SQLiteCommand(queryString, connection))
-                        {
-                            // Set command parameters.
-                            dbCommand.Parameters.AddWithValue("@id", item.Id);
-                            dbCommand.Parameters.AddWithValue("@position", item.Position);
-                            dbCommand.Parameters.AddWithValue("@status", item.Status);
-                            dbCommand.Parameters.AddWithValue("@note", item.Note);
-
-                            // Update status in table.
-                            if(dbCommand.ExecuteNonQuery() != 1)
-                            {
-                                transaction.Rollback();
-                                return false;
-                            }
-                        }
-                    }
-
-                    // Commit changes
-                    transaction.Commit();
-
-                    // Notify changes.
-                    if (this.StatusModified != null)
-                    {
-                        this.StatusModified(this, null);
-                    }
 
                     // Return success
                     return true;
@@ -1001,6 +1026,10 @@ namespace Job_Hunter.Model
          */
         private void CreateDataBase()
         {
+            // For simple item tables (e.g. next action, job type and status) table name MUST
+            // be the same as the title column name. This convention is used in several
+            // methods.
+
             // Table drop and create strings.
             string createActiveCountry = "create table if not exists " + tableActiveCountry + @"( 
                 id integer primary key,
@@ -1010,22 +1039,22 @@ namespace Job_Hunter.Model
 
             string createJobType = "create table if not exists " + tableJobType + @"(
                 id integer primary key,
-                position integer not null,
-                job_type text unique not null,
+                position integer not null,"
+                + tableJobType + @" text unique not null,
                 note text not null
                 )";
 
             string createNextAction = "create table if not exists " + tableNextAction + @"(
                 id integer primary key,
-                position integer not null,
-                next_action unique not null,
+                position integer not null,"
+                + tableNextAction +@" text unique not null,
                 note text not null
                 )";
 
             string createStatus = "create table if not exists " + tableStatus + @"(
                 id integer primary key,
-                position integer not null,
-                status unique not null,
+                position integer not null,"
+                 + tableStatus + @" text unique not null,
                 note text not null
                 )";
 
@@ -1079,17 +1108,11 @@ namespace Job_Hunter.Model
                     dbConnection.Open();
 
                     ExecuteDBNonQuery(createActiveCountry, dbConnection);
-                    Console.Out.WriteLine("Active country table created");
                     ExecuteDBNonQuery(createJobType, dbConnection);
-                    Console.Out.WriteLine("Job type table created");
                     ExecuteDBNonQuery(createNextAction, dbConnection);
-                    Console.Out.WriteLine("Next action table created");
                     ExecuteDBNonQuery(createStatus, dbConnection);
-                    Console.Out.WriteLine("Status table created");
                     ExecuteDBNonQuery(createOrganization, dbConnection);
-                    Console.Out.WriteLine("Organization table created");
                     ExecuteDBNonQuery(createApplication, dbConnection);
-                    Console.Out.WriteLine("Application table created");
 
                 }
 
@@ -1131,26 +1154,21 @@ namespace Job_Hunter.Model
                 {
                     ExecuteDBNonQuery(activeCountryInsertString + query, dbConnection);
                 }
-                Console.Out.WriteLine("Active country table populated");
                 ExecuteDBNonQuery(cleanJobType, dbConnection);
                 foreach (string query in jobTypeParams)
                 {
                     ExecuteDBNonQuery(jobTypeInsertString + query, dbConnection);
                 }
-                Console.Out.WriteLine("Job type table populated");
                 ExecuteDBNonQuery(cleanNextAction, dbConnection);
                 foreach (string query in nextActionParams)
                 {
                     ExecuteDBNonQuery(nextActionInsertString + query, dbConnection);
                 }
-                Console.Out.WriteLine("Next action table populated");
                 ExecuteDBNonQuery(cleanStatus, dbConnection);
                 foreach (string query in StatusParams)
                 {
                     ExecuteDBNonQuery(statusInsertString + query, dbConnection);
                 }
-                Console.Out.WriteLine("Status table populated");
-
             }
         }
 

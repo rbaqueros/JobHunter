@@ -28,7 +28,7 @@
     <UserControl.Resources>
         <DataTemplate x:Key="NextActionItemTemplate">
             <Border Padding="5" ToolTip="Select job application">
-                <TextBlock Text="{Binding NextAction}" FontSize="15" FontWeight="Bold" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding Title}" FontSize="15" FontWeight="Bold" VerticalAlignment="Center" />
             </Border>
         </DataTemplate>
     </UserControl.Resources>
@@ -46,20 +46,20 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Border BorderThickness="1" BorderBrush="LightGray" Padding="20">
-                    <ListBox x:Name="lstNextActions" ItemsSource="{Binding NextActionCollection}" ItemTemplate="{StaticResource NextActionItemTemplate}" SelectedIndex="0"
-                             SelectedItem="{Binding SelectedNextAction}" IsEnabled="{Binding NextActionListEnabled}"/>
+                    <ListBox x:Name="lstNextActions" ItemsSource="{Binding ItemCollection}" ItemTemplate="{StaticResource NextActionItemTemplate}" SelectedIndex="0"
+                             SelectedItem="{Binding SelectedItem}" IsEnabled="{Binding ItemListEnabled}"/>
                 </Border>
                 <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Stretch" Background="{DynamicResource FlatButtonBackgroundBrush}">
                     <Button x:Name="btnAdd" Content="ADD" ToolTip="Add next action" BorderThickness="0" Style="{DynamicResource MetroFlatButton2}"
-                            Command="{Binding AddButtonCommand}" IsEnabled="{Binding NextActionListEnabled}"/>
+                            Command="{Binding AddButtonCommand}" IsEnabled="{Binding ItemListEnabled}"/>
                     <Button x:Name="btnEdit" Content="EDIT" ToolTip="Edit next action" BorderThickness="0" Style="{DynamicResource MetroFlatButton2}"
-                            Command="{Binding EditButtonCommand}" IsEnabled="{Binding NextActionListEnabled}"/>
+                            Command="{Binding EditButtonCommand}" IsEnabled="{Binding ItemListEnabled}"/>
                     <Button x:Name="btnDelete" Content="DELETE" ToolTip="Delete next action" BorderThickness="0" Style="{DynamicResource MetroFlatButton2}"
-                            IsEnabled="{Binding NextActionListEnabled}" Command="{Binding DeleteButtonCommand}"/>
+                            IsEnabled="{Binding ItemListEnabled}" Command="{Binding DeleteButtonCommand}"/>
                     <Button x:Name="btnUp" Content="UP" ToolTip="Move next action up" BorderThickness="0" Style="{DynamicResource MetroFlatButton2}"
-                            Command="{Binding UpButtonCommand}" IsEnabled="{Binding NextActionListEnabled}"/>
+                            Command="{Binding UpButtonCommand}" IsEnabled="{Binding ItemListEnabled}"/>
                     <Button x:Name="btnDown" Content="DOWN" ToolTip="Move next action down" BorderThickness="0" Style="{DynamicResource MetroFlatButton2}"
-                            Command="{Binding DownButtonCommand}" IsEnabled="{Binding NextActionListEnabled}"/>
+                            Command="{Binding DownButtonCommand}" IsEnabled="{Binding ItemListEnabled}"/>
                 </StackPanel>
             </Grid>
             <Grid Grid.Column="1" Margin="10,0,0,0" Visibility="{Binding NotesVisibility}">
@@ -85,7 +85,7 @@
                             Command="{Binding SaveButtonCommand}"/>
                 </StackPanel>
             </Grid>
-            <Grid Grid.Column="1" Margin="10,0,0,0" Visibility="{Binding AddNextActionVisibility}">
+            <Grid Grid.Column="1" Margin="10,0,0,0" Visibility="{Binding AddItemVisibility}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
@@ -100,7 +100,7 @@
                         </Grid.RowDefinitions>
                         <TextBlock Text="NEXT ACTION" Foreground="{DynamicResource AccentColorBrush}" VerticalAlignment="Center" HorizontalAlignment="Left"
                                            FontWeight="Bold" FontSize="14" Margin="0,-5,0,5" />
-                        <TextBox Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" BorderThickness="1" Text="{Binding NextAction}"/>
+                        <TextBox Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" BorderThickness="1" Text="{Binding Item}"/>
                         <TextBlock Grid.Row="2" Text="NOTES" Foreground="{DynamicResource AccentColorBrush}" VerticalAlignment="Center" HorizontalAlignment="Left"
                                            FontWeight="Bold" FontSize="14" Margin="0,25,0,5" />
                         <TextBox Grid.Row="3" HorizontalAlignment="Stretch" TextWrapping="Wrap" VerticalAlignment="Stretch"

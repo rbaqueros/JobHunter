@@ -16,15 +16,15 @@
 
 using System.Windows.Media;
 
-namespace Job_Hunter.Model
+namespace Job_Hunter.ViewModel
 {
-    public struct PriorityItem
+    public struct PriorityVMItem
     {
         private int _priorityNumber;
         private string _priorityDescription;
         private SolidColorBrush _priorityColor;
 
-        public PriorityItem(int newPriorityNumber, string newPriorityDescription, SolidColorBrush newPriorityColor)
+        public PriorityVMItem(int newPriorityNumber, string newPriorityDescription, SolidColorBrush newPriorityColor)
         {
             _priorityNumber = newPriorityNumber;
             _priorityDescription = newPriorityDescription;

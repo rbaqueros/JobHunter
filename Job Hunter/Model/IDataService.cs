@@ -20,9 +20,6 @@ namespace Job_Hunter.Model
 {
     public interface IDataService
     {
-        //void InitializeCollections(Action<int> callback);
-        //void SaveCollections(Action<int> callback);
-
         // Application handling
         void ApplicationList(Action<ApplicationOrganizationItem[]> callback);
         int AddApplication(ApplicationItem item);
@@ -45,27 +42,30 @@ namespace Job_Hunter.Model
         event EventHandler CountryModified;
 
         // Next Action handling
-        void NextActionList(Action<NextActionItem[]> callback);
-        int AddNextAction(NextActionItem item);
-        int DeleteNextAction(NextActionItem item);
-        int UpdateNextAction(NextActionItem item);
-        bool UpdateNextActionList(NextActionItem[] itemList);
+        void NextActionList(Action<SimpleItem[]> callback);
+        int AddNextAction(string title, string note);
+        int DeleteNextAction(long id);
+        int UpdateNextAction(long id, long position, string title, string note);
+        bool NextActionDown(long position);
+        bool NextActionUp(long position);
         event EventHandler NextActionModified;
 
         // Job Type handling
-        void JobTypeList(Action<JobTypeItem[]> callback);
-        int AddJobType(JobTypeItem item);
-        int DeleteJobType(JobTypeItem item);
-        int UpdateJobType(JobTypeItem item);
-        bool UpdateJobTypeList(JobTypeItem[] itemList);
+        void JobTypeList(Action<SimpleItem[]> callback);
+        int AddJobType(string title, string note);
+        int DeleteJobType(long id);
+        int UpdateJobType(long id, long position, string title, string note);
+        bool JobTypeDown(long position);
+        bool JobTypeUp(long position);
         event EventHandler JobTypeModified;
 
         // Status handling
-        void StatusList(Action<StatusItem[]> callback);
-        int AddStatus(StatusItem item);
-        int DeleteStatus(StatusItem item);
-        int UpdateStatus(StatusItem item);
-        bool UpdateStatusList(StatusItem[] itemList);
+        void StatusList(Action<SimpleItem[]> callback);
+        int AddStatus(string title, string note);
+        int DeleteStatus(long id);
+        int UpdateStatus(long id, long position, string title, string note);
+        bool StatusDown(long position);
+        bool StatusUp(long position);
         event EventHandler StatusModified;
     }
 }

@@ -29,7 +29,7 @@
         WindowStartupLocation="CenterScreen"
         GlowBrush="{DynamicResource AccentColorBrush}"
         DataContext="{Binding Main, Source={StaticResource Locator}}"
-        Height="550" Width="900" Icon="Job_hunting2.ico">
+        Height="550" Width="900" Icon="Job Hunter Icon 3.ico">
 
     <Window.Resources>
         <DataTemplate DataType="{x:Type viewmodels:TabsViewModel}">

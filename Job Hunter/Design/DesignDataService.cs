@@ -56,14 +56,17 @@ namespace Job_Hunter.Design
 
             callback(applicationArray);
         }
+
         public int AddApplication(ApplicationItem item)
         {
             return 0;
         }
+
         public int DeleteApplication(ApplicationItem item)
         {
             return 0;
         }
+
         public int UpdateApplication(ApplicationItem item)
         {
             return 0;
@@ -84,14 +87,17 @@ namespace Job_Hunter.Design
 
             callback(organizationArray);
         }
+
         public int AddOrganization(OrganizationItem item)
         {
             return 0;
         }
+
         public int DeleteOrganization(OrganizationItem item)
         {
             return 0;
         }
+
         public int UpdateOrganization(OrganizationItem item)
         {
             return 0;
@@ -129,102 +135,115 @@ namespace Job_Hunter.Design
         }
 
         // Next action handling
-        public void NextActionList(Action<NextActionItem[]> callback)
+        public void NextActionList(Action<SimpleItem[]> callback)
         {
-            List<NextActionItem> nextActionList = new List<NextActionItem>();
+            List<SimpleItem> nextActionList = new List<SimpleItem>();
 
-            nextActionList.Add(new NextActionItem(0, 0, "Deliver resume", "Notes on Deliver resume next action"));
-            nextActionList.Add(new NextActionItem(1, 1, "Follow up email", "Notes on Follow up email next action"));
-            nextActionList.Add(new NextActionItem(2, 2, "Follow up call", "Notes on Follow up call next action"));
-            nextActionList.Add(new NextActionItem(3, 3, "Prepare for interview", "Notes on Prepare for interview next action"));
-            nextActionList.Add(new NextActionItem(4, 4, "No further action", "Notes on No further action next action"));
+            nextActionList.Add(new SimpleItem(0, 0, "Deliver resume", "Notes on Deliver resume next action"));
+            nextActionList.Add(new SimpleItem(1, 1, "Follow up email", "Notes on Follow up email next action"));
+            nextActionList.Add(new SimpleItem(2, 2, "Follow up call", "Notes on Follow up call next action"));
+            nextActionList.Add(new SimpleItem(3, 3, "Prepare for interview", "Notes on Prepare for interview next action"));
+            nextActionList.Add(new SimpleItem(4, 4, "No further action", "Notes on No further action next action"));
 
             callback(nextActionList.ToArray());
         }
 
-        public int AddNextAction(NextActionItem item)
+        public int AddNextAction(string title, string note)
         {
             return 0;
         }
 
-        public int DeleteNextAction(NextActionItem item)
+        public int DeleteNextAction(long id)
         {
             return 0;
         }
 
-        public int UpdateNextAction(NextActionItem item)
+        public int UpdateNextAction(long id, long position, string title, string note)
         {
             return 0;
         }
 
-        public bool UpdateNextActionList(NextActionItem[] itemList)
+        public bool NextActionDown(long position)
+        {
+            return true;
+        }
+
+        public bool NextActionUp(long position)
         {
             return true;
         }
 
         // Job type handling
-        public void JobTypeList(Action<JobTypeItem[]> callback)
+        public void JobTypeList(Action<SimpleItem[]> callback)
         {
-            List<JobTypeItem> jobTypeList = new List<JobTypeItem>();
+            List<SimpleItem> jobTypeList = new List<SimpleItem>();
 
-            jobTypeList.Add(new JobTypeItem(0, 0, "Academic Research", "Notes on Academic Research job type"));
-            jobTypeList.Add(new JobTypeItem(1, 1, "University", "Notes on University job type"));
-            jobTypeList.Add(new JobTypeItem(2, 2, "Private Research", "Notes on Private Research job type"));
-            jobTypeList.Add(new JobTypeItem(3, 3, "Developer", "Notes on Developer job type"));
+            jobTypeList.Add(new SimpleItem(0, 0, "Academic Research", "Notes on Academic Research job type"));
+            jobTypeList.Add(new SimpleItem(1, 1, "University", "Notes on University job type"));
+            jobTypeList.Add(new SimpleItem(2, 2, "Private Research", "Notes on Private Research job type"));
+            jobTypeList.Add(new SimpleItem(3, 3, "Developer", "Notes on Developer job type"));
 
             callback(jobTypeList.ToArray());
         }
 
-        public int AddJobType(JobTypeItem item)
+        public int AddJobType(string title, string note)
         {
             return 0;
         }
 
-        public int DeleteJobType(JobTypeItem item)
+        public int DeleteJobType(long id)
         {
             return 0;
         }
 
-        public int UpdateJobType(JobTypeItem item)
+        public int UpdateJobType(long id, long position, string title, string note)
         {
             return 0;
         }
-
-        public bool UpdateJobTypeList(JobTypeItem[] itemList)
+        public bool JobTypeDown(long position)
+        {
+            return true;
+        }
+        public bool JobTypeUp(long position)
         {
             return true;
         }
 
         // Status handling
-        public void StatusList(Action<StatusItem[]> callback)
+        public void StatusList(Action<SimpleItem[]> callback)
         {
-            List<StatusItem> statusList = new List<StatusItem>();
+            List<SimpleItem> statusList = new List<SimpleItem>();
 
-            statusList.Add(new StatusItem(0, 0, "No action yet", "Notes on no action yet status"));
-            statusList.Add(new StatusItem(1, 1, "Active", "Notes on active status"));
-            statusList.Add(new StatusItem(2, 2, "Resume sent", "Notes on resume sent status"));
-            statusList.Add(new StatusItem(3, 3, "Interview scheduled", "Notes on interview scheduled status"));
-            statusList.Add(new StatusItem(4, 4, "Concluded", "Notes on concluded status"));
+            statusList.Add(new SimpleItem(0, 0, "No action yet", "Notes on no action yet status"));
+            statusList.Add(new SimpleItem(1, 1, "Active", "Notes on active status"));
+            statusList.Add(new SimpleItem(2, 2, "Resume sent", "Notes on resume sent status"));
+            statusList.Add(new SimpleItem(3, 3, "Interview scheduled", "Notes on interview scheduled status"));
+            statusList.Add(new SimpleItem(4, 4, "Concluded", "Notes on concluded status"));
 
             callback(statusList.ToArray());
         }
 
-        public int AddStatus(StatusItem item)
+        public int AddStatus(string title, string note)
         {
             return 0;
         }
 
-        public int DeleteStatus(StatusItem item)
+        public int DeleteStatus(long id)
         {
             return 0;
         }
 
-        public int UpdateStatus(StatusItem item)
+        public int UpdateStatus(long id, long position, string title, string note)
         {
             return 0;
         }
 
-        public bool UpdateStatusList(StatusItem[] itemList)
+        public bool StatusDown(long position)
+        {
+            return true;
+        }
+
+        public bool StatusUp(long position)
         {
             return true;
         }

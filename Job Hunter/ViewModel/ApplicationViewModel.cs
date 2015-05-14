@@ -35,9 +35,9 @@ namespace Job_Hunter.ViewModel
         // Collections
         private ObservableCollection<ApplicationOrganizationVMItem> _applicationCollection;
         private ObservableCollection<OrganizationViewModelItem> _organizationCollection;
-        private ObservableCollection<NextActionItem> _nextActionCollection;
-        private ObservableCollection<JobTypeItem> _jobTypeCollection;
-        private ObservableCollection<StatusItem> _statusCollection;
+        private ObservableCollection<SimpleItem> _nextActionCollection;
+        private ObservableCollection<SimpleItem> _jobTypeCollection;
+        private ObservableCollection<SimpleItem> _statusCollection;
         private ObservableCollection<CountryViewModelItem> _countryCollection;
 
         // Selected application parameters
@@ -95,17 +95,17 @@ namespace Job_Hunter.ViewModel
             _dataService.OrganizationModified += (sender, e) => _dataService.OrganizationList(FillOrganizationCollection);
 
             // Get next action collection
-            _nextActionCollection = new ObservableCollection<NextActionItem>();
+            _nextActionCollection = new ObservableCollection<SimpleItem>();
             _dataService.NextActionList(FillNextActionCollection);
             _dataService.NextActionModified += (sender, e) => _dataService.NextActionList(FillNextActionCollection);
 
             // Get job type collection
-            _jobTypeCollection = new ObservableCollection<JobTypeItem>();
+            _jobTypeCollection = new ObservableCollection<SimpleItem>();
             _dataService.JobTypeList(FillJobTypeCollection);
             _dataService.JobTypeModified += (sender, e) => _dataService.JobTypeList(FillJobTypeCollection);
 
             // Get status collection and subscribe to data modified events.
-            _statusCollection = new ObservableCollection<StatusItem>();
+            _statusCollection = new ObservableCollection<SimpleItem>();
             _dataService.StatusList(FillStatusCollection);
             _dataService.StatusModified += (sender, e) => _dataService.StatusList(FillStatusCollection);
 
@@ -160,19 +160,19 @@ namespace Job_Hunter.ViewModel
             Organization = OrganizationCollection.Count() > 0 ? OrganizationCollection[0] : null;
         }
 
-        public void FillNextActionCollection(NextActionItem[] nextActionArray)
+        public void FillNextActionCollection(SimpleItem[] nextActionArray)
         {
-            NextActionCollection = new ObservableCollection<NextActionItem>(nextActionArray);
+            NextActionCollection = new ObservableCollection<SimpleItem>(nextActionArray);
         }
 
-        public void FillJobTypeCollection(JobTypeItem[] jobTypeArray)
+        public void FillJobTypeCollection(SimpleItem[] jobTypeArray)
         {
-            JobTypeCollection = new ObservableCollection<JobTypeItem>(jobTypeArray);
+            JobTypeCollection = new ObservableCollection<SimpleItem>(jobTypeArray);
         }
 
-        public void FillStatusCollection(StatusItem[] statusArray)
+        public void FillStatusCollection(SimpleItem[] statusArray)
         {
-            StatusCollection = new ObservableCollection<StatusItem>(statusArray);
+            StatusCollection = new ObservableCollection<SimpleItem>(statusArray);
         }
 
         public void FillCountryCollection(ActiveCountryItem[] activeCountryArray)
@@ -499,7 +499,7 @@ namespace Job_Hunter.ViewModel
         }
 
         //Status
-        public ObservableCollection<StatusItem> StatusCollection
+        public ObservableCollection<SimpleItem> StatusCollection
         {
             get { return _statusCollection; }
             set
@@ -511,7 +511,7 @@ namespace Job_Hunter.ViewModel
         }
 
         //Next actions
-        public ObservableCollection<NextActionItem> NextActionCollection
+        public ObservableCollection<SimpleItem> NextActionCollection
         {
             get { return _nextActionCollection; }
             set
@@ -523,7 +523,7 @@ namespace Job_Hunter.ViewModel
         }
 
         //Job type collection
-        public ObservableCollection<JobTypeItem> JobTypeCollection
+        public ObservableCollection<SimpleItem> JobTypeCollection
         {
             get { return _jobTypeCollection; }
             set
@@ -620,6 +620,8 @@ namespace Job_Hunter.ViewModel
             NextAction = "";
             NextActionDate = "";
             City = "";
+            Description = "";
+            Note = "";
 
             //Adjust visibility
             ListVisibility = Visibility.Collapsed;
