@@ -91,6 +91,7 @@
     <Compile Include="Model\IDataService.cs" />
     <Compile Include="Model\OrganizationItem.cs" />
     <Compile Include="ViewModel\SimpleItemBaseViewModel.cs" />
+    <Compile Include="ViewModel\ViewModelHelper.cs" />
     <Compile Include="ViewModel\ViewModelItems\PriorityVMItem.cs" />
     <Compile Include="Model\SimpleItem.cs" />
     <Compile Include="ViewModel\AboutViewModel.cs" />
